@@ -5,7 +5,7 @@ import time
 import math
 import numpy as np  
 
-model_path = "reference/mujoco_menagerie/franka_emika_panda/scene.xml"
+model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
 # controller = Controller()
 
