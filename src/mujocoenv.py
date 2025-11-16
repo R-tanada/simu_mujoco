@@ -5,11 +5,18 @@ import time
 
 class MujocoEnv:
     def __init__(self, model_path):
+        # diff link angle from vertical axis
         self.alpha1 = np.arctan(82/316)
-        self.alpha2 = np.arctan(82/386)
-        self.alpha3 = np.arctan(88/107)
+        self.alpha2 = -np.arctan(82/386)
+        self.alpha3 = -np.arctan(88/107)
+
+        # diff link angle from joint local axis
+        self.gamma1 = self.alpha1
+        self.gamma2 = self.alpha2 - self.alpha1
+        self.gamma3 = self.alpha3 - self.alpha2
+
         self.initialize(model_path)
-        # self.set_initial_transform()
+        self.set_initial_transform()
         # time.sleep(2)
 
     def initialize(self, model_path):
@@ -34,19 +41,21 @@ class MujocoEnv:
         l2 = 0.39265761166695853
         l3 = 0.13853880322855397
 
+        pitch = pitch + self.alpha3
+
         xw = x - l3* np.sin(pitch)
         zw = z - l3* np.cos(pitch)
         # print('xw: {}, zw: {}'.format(xw, zw))
         D = (xw**2 + zw**2 - l1**2 - l2**2) / (2 * l1 * l2)
         # print('D: {}'.format(D))
 
-        q2 = np.atan2(np.sqrt(1 - D**2), D)
-        q1 = np.atan2(l2 * np.sin(q2), l1 + l2 * np.cos(q2)) - np.atan2(zw, xw)
-        q3 = pitch - q1 - q2
+        q2 = np.arctan2(np.sqrt(1 - D**2), D) - self.gamma2
+        q1 = np.arctan2(-l2 * np.sin(q2+self.gamma2), l1 + l2 * np.cos(q2+self.gamma2)) - np.atan2(zw, xw) + np.pi/2 - self.gamma1
+        q3 = pitch - q1 - q2 - (self.gamma1+self.gamma2+self.gamma3)
 
         return q1, q2, q3
     
-    def set_initial_transform(self, pos = [300, 0, 100], rot = [0, 90, 0]):
+    def set_initial_transform(self, pos = [0, 0, 400], rot = [0, 90, 0]):
         x = pos[0]*0.001
         z = pos[2]*0.001
         pitch = rot[1] * np.pi / 180

@@ -39,11 +39,11 @@ try:
         #     act_id = mujo_env.model.actuator(act_name).id
         #     mujo_env.data.ctrl[act_id] = ctrl_value
         x = elasped_time * 10
-        print(x)
+        print("gamma1: {}, gamma2: {}, gamma3: {}".format(mujo_env.gamma1, mujo_env.gamma2, mujo_env.gamma3))
 
-        mujo_env.data.ctrl[6] = np.pi/4
+        # mujo_env.data.ctrl[6] = np.pi/4
         if elasped_time > 3:
-            mujo_env.transform(0.3, x*0.001, np.pi/2)
+            mujo_env.transform(x*0.001, 0.4, np.pi/2)
 
         mujo_env.step()
 
