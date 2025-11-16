@@ -85,7 +85,7 @@ class Controller:
                 #     print(f"L2 押し込み量: {l2_normalized:.2f}")
                 # if r2_normalized > 0.05:
                 #     print(f"R2 押し込み量: {r2_normalized:.2f}")
-                print(self.button_state)
+                # print(self.button_state)
                 
                 pygame.time.wait(50)  # 約20Hz
 

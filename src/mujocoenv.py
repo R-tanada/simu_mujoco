@@ -24,6 +24,7 @@ class MujocoEnv:
     def initialize(self, model_path):
         self.model = mujoco.MjModel.from_xml_path(model_path)
         self.data = mujoco.MjData(self.model)
+        self.renderer = mujoco.Renderer(self.model, 120, 120)
 
         self.cam = mujoco.MjvCamera()
         self.opt = mujoco.MjvOption()
@@ -37,6 +38,9 @@ class MujocoEnv:
 
         else:
             self.v.close()
+
+    # def step(self):
+    #     mujoco.mj_step(self.model, self.data)
 
     def inverse_kinematics_3axis(self, x, z, pitch):
         l1 = 0.3264659247149693
@@ -93,7 +97,8 @@ class MujocoEnv:
         self.set_joint_transform(self.current_transform[0], self.current_transform[1], self.current_transform[2], 255- button_state["gripper"]*255)
 
     def get_camera_rgb(self):
-        return mujoco.mjr_render(self.model, self.data, width=128, height=128, camera_name="ee_cam")
+        self.renderer.update_scene(self.data, camera=0)
+        return self.renderer.render()
 
 if __name__ == "__main__":
     # model_path = "models/franka_emika_panda/scene.xml"

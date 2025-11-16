@@ -44,7 +44,7 @@ try:
         #     act_id = mujo_env.model.actuator(act_name).id
         #     mujo_env.data.ctrl[act_id] = ctrl_value
         x = elasped_time * 10
-        print("gamma1: {}, gamma2: {}, gamma3: {}".format(mujo_env.gamma1, mujo_env.gamma2, mujo_env.gamma3))
+        # print("gamma1: {}, gamma2: {}, gamma3: {}".format(mujo_env.gamma1, mujo_env.gamma2, mujo_env.gamma3))
         button_state = controller.get_button_state()
         mujo_env.set_transform_with_controller(button_state)
 
@@ -58,7 +58,10 @@ try:
         #     time.sleep(loop_time - (time.perf_counter() - start_time))
 
         # rgb = mujo_env.get_camera_rgb()
+        # # print(rgb)
+
         # cv2.imshow("EE Camera", cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+        # cv2.waitKey(1)
 
 except KeyboardInterrupt:
     mujo_env.v.close()
