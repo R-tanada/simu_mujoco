@@ -4,6 +4,7 @@ import threading
 import time
 import math
 import numpy as np  
+import cv2
 
 model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
@@ -55,6 +56,9 @@ try:
         # if (time.perf_counter() - start_time) < loop_time:
         #     print(loop_time- (time.perf_counter() - start_time))
         #     time.sleep(loop_time - (time.perf_counter() - start_time))
+
+        # rgb = mujo_env.get_camera_rgb()
+        # cv2.imshow("EE Camera", cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
 
 except KeyboardInterrupt:
     mujo_env.v.close()

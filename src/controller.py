@@ -9,7 +9,9 @@ class Controller:
             "-x": 12, # `↓ボタン`
             "+z": 3, # `△ボタン`
             "-Z": 0, # `✕ボタン`
-            "gripper": 5, # `R2ボタン`
+            "+pitch": 10, # R2ボタン
+            "-pitch": 9, #L2ボタン
+            "gripper": 5 # `R2ボタン`
         }
         self.button_state = defaultdict(lambda: 0)
         self.initialize()

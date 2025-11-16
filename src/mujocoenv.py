@@ -15,7 +15,7 @@ class MujocoEnv:
         self.gamma2 = self.alpha2 - self.alpha1
         self.gamma3 = self.alpha3 - self.alpha2
 
-        self.current_transform = [0, 0.4, np.pi/2]  # x, z, pitch
+        self.current_transform = [0.2, 0.1, np.pi]  # x, z, pitch
 
         self.initialize(model_path)
         self.set_initial_transform()
@@ -57,7 +57,7 @@ class MujocoEnv:
 
         return q1, q2, q3
     
-    def set_initial_transform(self, pos = [0, 0, 400], rot = [0, 0, 0], gripper=0):
+    def set_initial_transform(self, pos = [200, 0, 200], rot = [0, 180, 0], gripper=0):
         x = pos[0]*0.001
         z = pos[2]*0.001
         pitch = rot[1] * np.pi / 180
@@ -85,8 +85,15 @@ class MujocoEnv:
             self.current_transform[1] += 0.0001
         if button_state["-Z"] == 1:
             self.current_transform[1] -= 0.0001
+        if button_state["+pitch"] == 1:
+            self.current_transform[2] += 0.0008
+        if button_state["-pitch"] == 1:
+            self.current_transform[2] -= 0.0008
 
-        self.set_joint_transform(self.current_transform[0], self.current_transform[1], pitch, 255- button_state["gripper"]*255)
+        self.set_joint_transform(self.current_transform[0], self.current_transform[1], self.current_transform[2], 255- button_state["gripper"]*255)
+
+    def get_camera_rgb(self):
+        return mujoco.mjr_render(self.model, self.data, width=128, height=128, camera_name="ee_cam")
 
 if __name__ == "__main__":
     # model_path = "models/franka_emika_panda/scene.xml"
