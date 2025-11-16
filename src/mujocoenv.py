@@ -15,6 +15,8 @@ class MujocoEnv:
         self.gamma2 = self.alpha2 - self.alpha1
         self.gamma3 = self.alpha3 - self.alpha2
 
+        self.current_transform = [0, 0.4, np.pi/2]  # x, z, pitch
+
         self.initialize(model_path)
         self.set_initial_transform()
         # time.sleep(2)
@@ -55,14 +57,14 @@ class MujocoEnv:
 
         return q1, q2, q3
     
-    def set_initial_transform(self, pos = [0, 0, 400], rot = [0, 90, 0]):
+    def set_initial_transform(self, pos = [0, 0, 400], rot = [0, 0, 0], gripper=0):
         x = pos[0]*0.001
         z = pos[2]*0.001
         pitch = rot[1] * np.pi / 180
 
-        self.transform(x, z, pitch)
+        self.set_joint_transform(x, z, pitch, gripper)
 
-    def transform(self, x, z, pitch):
+    def set_joint_transform(self, x, z, pitch, gripper):
         q1, q2, q3 = self.inverse_kinematics_3axis(x, z, pitch)
         # print(' q1: {}, q2: {}, q3: {}'.format(q1, q2, q3))
         
@@ -70,26 +72,21 @@ class MujocoEnv:
         self.data.ctrl[3] = -q2
         self.data.ctrl[5] = np.pi - q3
         self.data.ctrl[6] = np.pi/4
+        self.data.ctrl[7] = gripper  # gripper
 
-    def calc_ctrl_for_targets(self, q_targets):
-        ctrl_values = {}
-        
-        for act_name, q_target in q_targets.items():
-            act_id = self.model.actuator(act_name).id
-            # エンドエフェクタ用（tendonなど）はスキップ
-            if self.model.actuator_trnid[act_id, 0] < 0:
-                continue
-            
-            # gainprm と biasprm の取得（1軸簡易計算）
-            g = self.model.actuator_gainprm[act_id][0]
-            b_q = self.model.actuator_biasprm[act_id][1]
-            b_c = self.model.actuator_biasprm[act_id][2]
-            
-            # ctrl値を逆算
-            ctrl = - (b_q * q_target + b_c) / g
-            ctrl_values[act_name] = ctrl-0.1
-        
-        return ctrl_values
+    def set_transform_with_controller(self, button_state: dict):
+        pitch = np.pi
+
+        if button_state["+x"] == 1:
+            self.current_transform[0] += 0.0001
+        if button_state["-x"] == 1:
+            self.current_transform[0] -= 0.0001
+        if button_state["+z"] == 1:
+            self.current_transform[1] += 0.0001
+        if button_state["-Z"] == 1:
+            self.current_transform[1] -= 0.0001
+
+        self.set_joint_transform(self.current_transform[0], self.current_transform[1], pitch, 255- button_state["gripper"]*255)
 
 if __name__ == "__main__":
     # model_path = "models/franka_emika_panda/scene.xml"

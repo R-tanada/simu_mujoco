@@ -1,0 +1,5 @@
+<mujoco>
+  <worldbody>
+    <geom name="red_box" type="box" size="0.02 0.02 0.02" rgba="1 0 0 1" pos="0.5 0 0.01"/>
+  </worldbody>
+</mujoco>
