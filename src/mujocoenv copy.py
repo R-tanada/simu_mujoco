@@ -6,19 +6,9 @@ import time
 class MujocoEnv:
     def __init__(self, model_path):
         # diff link angle from vertical axis
-        self.alpha1 = np.arctan(82/316)
-        self.alpha2 = -np.arctan(82/386)
-        self.alpha3 = -np.arctan(88/107)
-
-        # diff link angle from joint local axis
-        self.gamma1 = self.alpha1
-        self.gamma2 = self.alpha2 - self.alpha1
-        self.gamma3 = self.alpha3 - self.alpha2
-
-        self.current_transform = [0.4, -0.1, np.pi]  # x, z, pitch
 
         self.initialize(model_path)
-        self.set_initial_transform()
+        # self.set_initial_transform
         # time.sleep(2)
 
     def initialize(self, model_path):
@@ -61,7 +51,7 @@ class MujocoEnv:
 
         return q1, q2, q3
     
-    def set_initial_transform(self, pos = [300, 0, 100], rot = [0, 180, 0], gripper=0):
+    def set_initial_transform(self, pos = [200, 0, 200], rot = [0, 180, 0], gripper=0):
         x = pos[0]*0.001
         z = pos[2]*0.001
         pitch = rot[1] * np.pi / 180
@@ -102,7 +92,7 @@ class MujocoEnv:
 
 if __name__ == "__main__":
     # model_path = "models/franka_emika_panda/scene.xml"
-    model_path = "models/friction.xml"
+    model_path = "models/friction/scene.xml"
     model = MujocoEnv(model_path)
 
     time.sleep(1)

@@ -1,0 +1,19 @@
+<mujoco model="inclined_plane_mid">
+  <compiler angle="radian" />
+  <default>
+    <joint damping="0.1"/>
+  </default>
+
+  <worldbody>
+    <!-- 傾斜床: x軸周りに30度傾ける -->
+    <body name="floor" pos="0 0 0">
+      <geom type="plane" size="2 2 0.1" friction="0.1 0.005 0.0001" euler="0 0.523598 0"/>
+    </body>
+
+    <!-- 箱: 坂の途中に配置 -->
+    <body name="box" pos="-0.9 0 0.9"> <!-- x=0、y=0 の位置に高さをtan(30°)*0.5で設定 -->
+      <joint name="box_joint" type="free"/>
+      <geom type="box" size="0.05 0.05 0.05" mass="1"/>
+    </body>
+  </worldbody>
+</mujoco>
