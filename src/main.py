@@ -10,11 +10,11 @@ model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
 
 initial_time = time.perf_counter()
-controller = Controller()
+# controller = Controller()
 
-buttom_thred = threading.Thread(target=controller.get_joystick)
-buttom_thred.setDaemon(True)
-buttom_thred.start()
+# buttom_thred = threading.Thread(target=controller.get_joystick)
+# buttom_thred.setDaemon(True)
+# buttom_thred.start()
 
 loop_freq = 500  # Hz
 loop_time = 1.0 / loop_freq
@@ -45,8 +45,8 @@ try:
         #     mujo_env.data.ctrl[act_id] = ctrl_value
         x = elasped_time * 10
         # print("gamma1: {}, gamma2: {}, gamma3: {}".format(mujo_env.gamma1, mujo_env.gamma2, mujo_env.gamma3))
-        button_state = controller.get_button_state()
-        mujo_env.set_transform_with_controller(button_state)
+        # button_state = controller.get_button_state()
+        # mujo_env.set_transform_with_controller(button_state)
 
         # mujo_env.data.ctrl[6] = np.pi/4
         # if elasped_time > 3:
@@ -57,11 +57,14 @@ try:
         #     print(loop_time- (time.perf_counter() - start_time))
         #     time.sleep(loop_time - (time.perf_counter() - start_time))
 
-        rgb = mujo_env.get_camera_rgb()
+        # rgb = mujo_env.get_camera_rgb()
         # print(rgb)
 
-        cv2.imshow("EE Camera", cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
-        cv2.waitKey(1)
+        # pos = mujo_env.data.cam_xpos[0].copy()
+        # print(pos)
+
+        # cv2.imshow("EE Camera", cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+        # cv2.waitKey(1)
 
 except KeyboardInterrupt:
     mujo_env.v.close()
