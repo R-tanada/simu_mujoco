@@ -1,16 +1,21 @@
 from mujocoenv import MujocoEnv
+from actorcritic import PolicyNet, ImagePreprocessor, ValueNet, Agent, ReplayBuffer
 from controller import Controller
 import threading
 import time
 import math
 import numpy as np  
 import cv2
-from actor
 
 model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
 
 initial_time = time.perf_counter()
+policy = PolicyNet(3)
+process = ImagePreprocessor()
+value = ValueNet()
+agent = Agent()
+buffer = ReplayBuffer(50, 20)
 # controller = Controller()
 
 # buttom_thred = threading.Thread(target=controller.get_joystick)
@@ -58,8 +63,23 @@ try:
         #     print(loop_time- (time.perf_counter() - start_time))
         #     time.sleep(loop_time - (time.perf_counter() - start_time))
 
-        # rgb = mujo_env.get_camera_rgb()
+        rgb = mujo_env.get_camera_rgb()
+        state = process.preprocess_image(rgb)
+        print(state.shape)
+        mean, std = policy.forward(state)
+        v = value.forward(state)
+        # print('mean: {}, std: {}'.format(mean[0], std))
+        # print('value: {}'.format(v))
+
+        action, mean = agent.get_action(state)
+        print('action: {}, mean: {}'.format(action, mean))
+
+        agent.reply.add_memory(state, action, 1, state, True)
+        # print(buffer.buffer)
+        print(len(agent.reply.buffer))
         # print(rgb)
+        agent.update()
+        # print(states)
 
         # pos = mujo_env.data.cam_xpos[0].copy()
         # print(pos)

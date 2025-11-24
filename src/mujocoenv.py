@@ -18,13 +18,13 @@ class MujocoEnv:
         self.current_transform = [0.4, -0.1, np.pi]  # x, z, pitch
 
         self.initialize(model_path)
-        self.set_initial_transform()
+        # self.set_initial_transform()
         # time.sleep(2)
 
     def initialize(self, model_path):
         self.model = mujoco.MjModel.from_xml_path(model_path)
         self.data = mujoco.MjData(self.model)
-        self.renderer = mujoco.Renderer(self.model, 360, 360)
+        self.renderer = mujoco.Renderer(self.model, 256, 256)
 
         self.cam = mujoco.MjvCamera()
         self.opt = mujoco.MjvOption()
@@ -101,8 +101,8 @@ class MujocoEnv:
         return self.renderer.render()
 
 if __name__ == "__main__":
-    # model_path = "models/franka_emika_panda/scene.xml"
-    model_path = "models/friction.xml"
+    model_path = "models/franka_emika_panda/scene.xml"
+    # model_path = "models/friction.xml"
     model = MujocoEnv(model_path)
 
     time.sleep(1)
