@@ -18,19 +18,19 @@
       <default class="collision">
         <geom type="mesh" group="3"/>
         <default class="fingertip_pad_collision_1">
-          <geom type="box" size="0.0085 0.004 0.0085" pos="0 0.0055 0.0445" friction="1.0"/>
+          <geom type="box" size="0.0085 0.004 0.0085" pos="0 0.0055 0.0445"/>
         </default>
         <default class="fingertip_pad_collision_2">
-          <geom type="box" size="0.003 0.002 0.003" pos="0.0055 0.002 0.05" friction="1.0"/>
+          <geom type="box" size="0.003 0.002 0.003" pos="0.0055 0.002 0.05"/>
         </default>
         <default class="fingertip_pad_collision_3">
-          <geom type="box" size="0.003 0.002 0.003" pos="-0.0055 0.002 0.05" friction="1.0"/>
+          <geom type="box" size="0.003 0.002 0.003" pos="-0.0055 0.002 0.05"/>
         </default>
         <default class="fingertip_pad_collision_4">
-          <geom type="box" size="0.003 0.002 0.0035" pos="0.0055 0.002 0.0395" friction="1.0"/>
+          <geom type="box" size="0.003 0.002 0.0035" pos="0.0055 0.002 0.0395"/>
         </default>
         <default class="fingertip_pad_collision_5">
-          <geom type="box" size="0.003 0.002 0.0035" pos="-0.0055 0.002 0.0395" friction="1.0"/>
+          <geom type="box" size="0.003 0.002 0.0035" pos="-0.0055 0.002 0.0395"/>
         </default>
       </default>
     </default>
@@ -120,6 +120,7 @@
     <body name="link0" childclass="panda">
       <inertial mass="0.629769" pos="-0.041018 -0.00014 0.049974"
         fullinertia="0.00315 0.00388 0.004285 8.2904e-7 0.00015 8.2299e-6"/>
+      <!-- <camera name="head_cam" pos="-0.7 0.3 0.8" euler="0 -0.9 -1.9"/> -->
       <geom mesh="link0_0" material="off_white" class="visual"/>
       <geom mesh="link0_1" material="black" class="visual"/>
       <geom mesh="link0_2" material="off_white" class="visual"/>
@@ -210,7 +211,7 @@
                     <body name="hand" pos="0 0 0.107" quat="0.9238795 0 0 -0.3826834">
                       <!-- カメラ追加 -->
                       <!-- <geom type="box" size="0.02 0.02 0.02" pos="0.04 0 0"/> -->
-                      <camera name="ee_cam" pos="0.04 0 0" euler="0 3.14 1.5708"/>
+                      <!-- <camera name="ee_cam" pos="0.04 0 0" euler="0 3.14 1.5708"/> -->
                       <!--  -->
                       <inertial mass="0.73" pos="-0.01 0 0.03" diaginertia="0.001 0.0025 0.0017"/>
                       <geom mesh="hand_0" material="off_white" class="visual"/>
@@ -222,8 +223,8 @@
                       <body name="left_finger" pos="0 0 0.0584">
                         <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
                         <joint name="finger_joint1" class="finger"/>
-                        <geom mesh="finger_0" material="off_white" class="visual" friction="1.0"/>
-                        <geom mesh="finger_1" material="black" class="visual" friction="1.0"/>
+                        <geom mesh="finger_0" material="off_white" class="visual"/>
+                        <geom mesh="finger_1" material="black" class="visual"/>
                         <geom mesh="finger_0" class="collision"/>
                         <geom class="fingertip_pad_collision_1"/>
                         <geom class="fingertip_pad_collision_2"/>
@@ -234,8 +235,8 @@
                       <body name="right_finger" pos="0 0 0.0584" quat="0 0 0 1">
                         <inertial mass="0.015" pos="0 0 0" diaginertia="2.375e-6 2.375e-6 7.5e-7"/>
                         <joint name="finger_joint2" class="finger"/>
-                        <geom mesh="finger_0" material="off_white" class="visual" friction="1.0"/>
-                        <geom mesh="finger_1" material="black" class="visual" friction="1.0"/>
+                        <geom mesh="finger_0" material="off_white" class="visual"/>
+                        <geom mesh="finger_1" material="black" class="visual"/>
                         <geom mesh="finger_0" class="collision"/>
                         <geom class="fingertip_pad_collision_1"/>
                         <geom class="fingertip_pad_collision_2"/>

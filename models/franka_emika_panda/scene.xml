@@ -20,6 +20,8 @@
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
     <geom name="floor" size="2 2 0.05" type="plane" material="groundplane"/>
+    <camera pos="-0.600 0.570 0.670" xyaxes="-0.504 -0.864 -0.000 0.379 -0.221 0.899"/>
+
   </worldbody>
   
 </mujoco>
