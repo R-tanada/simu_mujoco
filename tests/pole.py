@@ -81,8 +81,6 @@ class ActorNet(nn.Module):
         mean = torch.tanh(mean) * self.action_scale + self.action_bias
         return action, mean
 
-        return action, mean
-
     def to(self, device):
         self.action_scale = self.action_scale.to(device)
         self.action_bias = self.action_bias.to(device)
@@ -90,6 +88,7 @@ class ActorNet(nn.Module):
 class ActorCriticModel(object):
 
     def __init__(self, state_dim, action_dim, action_scale, args, device):
+        print(action_dim)
         # カウンタ類
         self.total_it = 0
         # args にあわせる

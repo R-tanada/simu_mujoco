@@ -5,16 +5,17 @@ import time
 import math
 import numpy as np  
 import cv2
+from actor
 
 model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
 
 initial_time = time.perf_counter()
-controller = Controller()
+# controller = Controller()
 
-buttom_thred = threading.Thread(target=controller.get_joystick)
-buttom_thred.setDaemon(True)
-buttom_thred.start()
+# buttom_thred = threading.Thread(target=controller.get_joystick)
+# buttom_thred.setDaemon(True)
+# buttom_thred.start()
 
 loop_freq = 500  # Hz
 loop_time = 1.0 / loop_freq
@@ -45,8 +46,8 @@ try:
         #     mujo_env.data.ctrl[act_id] = ctrl_value
         x = elasped_time * 10
         # print("gamma1: {}, gamma2: {}, gamma3: {}".format(mujo_env.gamma1, mujo_env.gamma2, mujo_env.gamma3))
-        button_state = controller.get_button_state()
-        mujo_env.set_transform_with_controller(button_state)
+        # button_state = controller.get_button_state()
+        # mujo_env.set_transform_with_controller(button_state)
 
         # mujo_env.data.ctrl[6] = np.pi/4
         # if elasped_time > 3:
@@ -66,3 +67,5 @@ try:
 except KeyboardInterrupt:
     mujo_env.v.close()
     print("finish mainloop")
+
+
