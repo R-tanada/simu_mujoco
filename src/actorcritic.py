@@ -61,7 +61,7 @@ class ValueNet(nn.Module):
 class Agent:
     def __init__(self):
         self.gamma = 0.98
-        self.lr = 0.002
+        self.lr = 0.0001
         self.action_size = 4
 
         self.pi = PolicyNet(self.action_size)
@@ -72,15 +72,16 @@ class Agent:
 
     def get_action(self, state):
         mean, log_std = self.pi.forward(state)
+        log_std = torch.clamp(log_std, -20, 2)
         std = log_std.exp()
         normal = Normal(mean, std)
         x_t = normal.rsample()
         y_t = torch.tanh(x_t)
         action = y_t
         mean = torch.tanh(mean)
-        return action, mean
+        return action, mean, std
     
-    # def update(self):
+    # def update_batch(self):
     #     if len(self.reply.buffer) < 500:
     #         return
     #     state_batch, action_batach, reward_batch, next_state_bach, done_batch =  self.reply.get_batch()
@@ -92,6 +93,36 @@ class Agent:
     #     self.optimizer_v.zero_grad()
     #     critic_loss.backward()
     #     self.optimizer_v.step()
+
+    def update(self, state, action, mean, std, reward, next_state, done):
+        # ---- critic ----
+        v_target = reward + self.gamma * self.v(next_state) * (1 - done)
+        v_target = v_target.detach()
+
+        v_value = self.v(state)
+        loss_v = F.mse_loss(v_value, v_target)
+
+        # ---- actor ----
+        delta = v_target - v_value
+        delta = delta.detach()
+
+        # 多次元ガウスの log pi（独立）
+        log_pi = -0.5*((action - mean)/std)**2 - torch.log(std) - 0.5*torch.log(torch.tensor(2*3.141592))
+
+        log_pi = log_pi.sum(dim=-1)  # 各dimensionを合計
+
+        loss_pi = -(log_pi * delta).mean()
+
+        # ---- update ----
+        self.optimizer_v.zero_grad()
+        self.optimizer_pi.zero_grad()
+
+        loss_v.backward()
+        loss_pi.backward()
+
+        self.optimizer_v.step()
+        self.optimizer_pi.step()
+
 
 class ReplayBuffer:
     def __init__(self, buffer_size, batch_size):

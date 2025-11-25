@@ -1,6 +1,6 @@
 <mujoco>
   <worldbody>
-    <body name="red_box" pos="0.4 0 0.3">
+    <body name="red_box" pos="0.5 0 0.02">
       <joint name="box_joint" type="free"/>
       <geom type="box" size="0.02 0.02 0.02" rgba="1 0 0 1" mass="0.05" friction="0.5"/>
     </body>

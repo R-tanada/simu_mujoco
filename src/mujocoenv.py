@@ -2,9 +2,12 @@ import mujoco
 import numpy as np
 from mujoco import viewer
 import time
+from actorcritic import ImagePreprocessor
 
 class MujocoEnv:
     def __init__(self, model_path):
+        self.process = ImagePreprocessor()
+
         # diff link angle from vertical axis
         self.alpha1 = np.arctan(82/316)
         self.alpha2 = -np.arctan(82/386)
@@ -15,10 +18,10 @@ class MujocoEnv:
         self.gamma2 = self.alpha2 - self.alpha1
         self.gamma3 = self.alpha3 - self.alpha2
 
-        self.current_transform = [0.4, -0.1, np.pi]  # x, z, pitch
+        self.current_transform = [0.4, 0.1, np.pi]  # x, z, pitch
 
         self.initialize(model_path)
-        # self.set_initial_transform()
+        self.set_initial_transform()
         # time.sleep(2)
 
     def initialize(self, model_path):
@@ -31,7 +34,10 @@ class MujocoEnv:
         self.scene = mujoco.MjvScene(self.model, maxgeom=10000)
         self.v = viewer.launch_passive(self.model, self.data)
 
-    def step(self):
+    def step(self, action):
+        q1, q2, q3, q4 = action[0][0].item(), action[0][1].item(), action[0][2].item(), action[0][3].item()
+        self.set_joint_transform(q1, q2, q3, q4)
+
         if self.v.is_running():
             mujoco.mj_step(self.model, self.data)
             self.v.sync()
@@ -39,8 +45,14 @@ class MujocoEnv:
         else:
             self.v.close()
 
-    # def step(self):
-    #     mujoco.mj_step(self.model, self.data)
+        next_state = self.process.preprocess_image(self.get_camera_rgb())
+        body = self.data.body('hand')
+        body_pos = body.xpos
+        body_quat = body.xquat
+        reward = self.reward(body_pos)
+        done, reward_2 = self.cheak_area(body_pos, body_quat)
+
+        return next_state, reward+reward_2, done
 
     def inverse_kinematics_3axis(self, x, z, pitch):
         l1 = 0.3264659247149693
@@ -61,14 +73,14 @@ class MujocoEnv:
 
         return q1, q2, q3
     
-    def set_initial_transform(self, pos = [300, 0, 100], rot = [0, 180, 0], gripper=0):
+    def set_initial_transform(self, pos = [400, 0, 0], rot = [0, 180, 0], gripper=0):
         x = pos[0]*0.001
         z = pos[2]*0.001
         pitch = rot[1] * np.pi / 180
 
-        self.set_joint_transform(x, z, pitch, gripper)
+        self.set_joint_transform_inv(x, z, pitch, gripper)
 
-    def set_joint_transform(self, x, z, pitch, gripper):
+    def set_joint_transform_inv(self, x, z, pitch, gripper):
         q1, q2, q3 = self.inverse_kinematics_3axis(x, z, pitch)
         # print(' q1: {}, q2: {}, q3: {}'.format(q1, q2, q3))
         
@@ -77,6 +89,15 @@ class MujocoEnv:
         self.data.ctrl[5] = np.pi - q3
         self.data.ctrl[6] = np.pi/4
         self.data.ctrl[7] = gripper  # gripper
+
+    def set_joint_transform(self, r1, r2, r3, r4):
+        q1, q2, q3 = self.inverse_kinematics_3axis(0.4, 0, np.pi)
+        # print(' q1: {}, q2: {}, q3: {}'.format(q1, q2, q3))
+        
+        self.data.ctrl[1] = q1 + r1
+        self.data.ctrl[3] = -q2 + r2
+        self.data.ctrl[5] = np.pi - q3 + r4
+        self.data.ctrl[7] = 255 + r4  # gripper
 
     def set_transform_with_controller(self, button_state: dict):
         pitch = np.pi
@@ -99,6 +120,66 @@ class MujocoEnv:
     def get_camera_rgb(self):
         self.renderer.update_scene(self.data, camera=0)
         return self.renderer.render()
+    
+    def reset(self):
+        self.set_initial_transform()
+        for i in range(200):
+            mujoco.mj_step(self.model, self.data)
+
+        self.renderer.update_scene(self.data, camera=0)
+        return self.process.preprocess_image(self.renderer.render())
+    
+    def reward(self, current_pos):
+        box_pos = [0.5, 0, 0.02]
+        return -np.linalg.norm(current_pos-box_pos)*10
+    
+    def cheak_area(sefl, pos, quat):
+        def quat_to_euler_wxyz(quat):
+            """
+            クオータニオン [w, x, y, z] からオイラー角に変換
+            返り値: roll (X軸回転), pitch (Y軸回転), yaw (Z軸回転)
+            """
+            w, x, y, z = quat
+
+            # roll (X軸回転)
+            t0 = +2.0 * (w*x + y*z)
+            t1 = +1.0 - 2.0 * (x*x + y*y)
+            roll = np.arctan2(t0, t1)
+
+            # pitch (Y軸回転)
+            t2 = +2.0 * (w*y - z*x)
+            t2 = np.clip(t2, -1.0, 1.0)  # 数値安定性のためクリップ
+            pitch = np.arcsin(t2)
+
+            # yaw (Z軸回転)
+            t3 = +2.0 * (w*z + x*y)
+            t4 = +1.0 - 2.0 * (y*y + z*z)
+            yaw = np.arctan2(t3, t4)
+
+            return roll, pitch, yaw
+        
+        euler = quat_to_euler_wxyz(quat)
+        box_pos = [0.5, 0, 0.02]
+
+        if pos[0] < 0.35 or pos[0] > 0.6:
+            return True, -100
+        elif pos[2] < 0.12 or pos[2] > 0.5:
+            return True, -100
+        elif euler[1] < -0.45 or euler[1] > 0.45:
+            return True, -100
+        elif np.linalg.norm(pos - box_pos)<0.13:
+            return True, 100
+        
+        return False, 0
+
+    
+# class RLEnv:
+#     def __init__(self):
+#         self.box_pos = [0.4, 0, 0.02]
+
+#     def reward(self, current_pos):
+        
+
 
 if __name__ == "__main__":
     model_path = "models/franka_emika_panda/scene.xml"

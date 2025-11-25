@@ -139,9 +139,8 @@
         <joint name="joint1"/>
         <geom material="white" mesh="link1" class="visual"/>
         <geom mesh="link1_c" class="collision"/>
-        <!-- <body name="link2" quat="1 -1 0 0"> -->
-        <!-- <body name="link2" quat="-0.7071 0.7071 0 0"> -->
-        <body name="link2" quat="-0.6830 0.6830 -0.1830 -0.1830">
+        <body name="link2" quat="1 -1 0 0">
+        <!-- <body name="link2" quat="0.6487838880 -0.6487838880 -0.2812107157 -0.2812107157"> -->
           <inertial mass="0.646926" pos="-0.003141 -0.02872 0.003495"
             fullinertia="0.0079620 2.8110e-2 2.5995e-2 -3.925e-3 1.0254e-2 7.04e-4"/>
           <joint name="joint2" range="-1.7628 1.7628"/>
@@ -280,7 +279,7 @@
       ctrlrange="-0.0175 3.7525"/>
     <general class="panda" name="actuator7" joint="joint7" gainprm="2000" biasprm="0 -2000 -200" forcerange="-12 12"/>
     <!-- Remap original ctrlrange (0, 0.04) to (0, 255): 0.04 * 100 / 255 = 0.01568627451 -->
-    <general class="panda" name="actuator8" tendon="split" forcerange="-100 100" ctrlrange="0 255"
+    <general class="panda" name="actuator8" tendon="split" forcerange="-100 100" ctrlrange="0 3"
       gainprm="0.01568627451 0 0" biasprm="0 -100 -10"/>
   </actuator>
 

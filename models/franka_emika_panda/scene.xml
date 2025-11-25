@@ -22,6 +22,13 @@
     <geom name="floor" size="2 2 0.05" type="plane" material="groundplane"/>
     <!-- camera for RL -->
     <camera pos="-0.600 0.570 0.670" xyaxes="-0.504 -0.864 -0.000 0.379 -0.221 0.899"/>
+    <!-- add axis -->
+    <!-- red -->
+    <geom name="x_axis" type="cylinder" fromto="0 0 0  0.2 0 0" size="0.005" rgba="1 0 0 1"/>
+    <!-- green -->
+    <geom name="y_axis" type="cylinder" fromto="0 0 0  0 0.2 0" size="0.005" rgba="0 1 0 1"/>
+    <!-- blue -->
+    <geom name="z_axis" type="cylinder" fromto="0 0 0  0 0 0.2" size="0.005" rgba="0 0 1 1"/>
 
   </worldbody>
   
