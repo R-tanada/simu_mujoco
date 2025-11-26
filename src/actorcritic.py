@@ -73,12 +73,14 @@ class Agent:
     def get_action(self, state):
         mean, log_std = self.pi.forward(state)
         log_std = torch.clamp(log_std, -20, 2)
+        mean = torch.tanh(mean)*2*np.pi*0.002
         std = log_std.exp()
         normal = Normal(mean, std)
         x_t = normal.rsample()
         y_t = torch.tanh(x_t)
         action = y_t
-        mean = torch.tanh(mean)
+        # mean = torch.tanh(mean)*2*np.pi*0.002
+        print(mean)
         return action, mean, std
     
     # def update_batch(self):

@@ -41,6 +41,7 @@ try:
             agent.update(state, action, mean, std, reward, next_state, done)
             state = next_state
             total_reward += reward
+            # time.sleep(0.1)
 
         print(total_reward)
 
