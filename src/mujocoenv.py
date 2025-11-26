@@ -39,6 +39,19 @@ class MujocoEnv:
         else:
             self.v.close()
 
+    def foward_kinematics_3axis(self, q1, q2, q3):
+        l1 = 0.3264659247149693
+        l2 = 0.39265761166695853
+        l3 = 0.13853880322855397
+        q1 += self.gamma1
+        q2 += self.gamma2
+        q3 += self.gamma3
+        x = l1*np.sin(q1)+l2*np.sin(q1+q2)+l3*np.sin(q1+q2+q3)
+        z = l1*np.cos(q1)+l2*np.cos(q1+q2)+l3*np.cos(q1+q2+q3)
+        pitch = q1 + q2 + q3
+
+        return x, z, pitch
+
     # def step(self):
     #     mujoco.mj_step(self.model, self.data)
 
@@ -71,6 +84,8 @@ class MujocoEnv:
     def set_joint_transform(self, x, z, pitch, gripper):
         q1, q2, q3 = self.inverse_kinematics_3axis(x, z, pitch)
         # print(' q1: {}, q2: {}, q3: {}'.format(q1, q2, q3))
+        x, y, z = self.foward_kinematics_3axis(q1, q2, q3)
+        print(x, y, z)
         
         self.data.ctrl[1] = q1
         self.data.ctrl[3] = -q2
