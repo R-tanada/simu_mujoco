@@ -117,11 +117,14 @@ class MujocoEnv:
         l1 = 0.3264659247149693
         l2 = 0.39265761166695853
         l3 = 0.13853880322855397
+        q1 += self.gamma1
+        q2 += self.gamma2
+        q3 += self.gamma3
         x = l1*np.sin(q1)+l2*np.sin(q1+q2)+l3*np.sin(q1+q2+q3)
         z = l1*np.cos(q1)+l2*np.cos(q1+q2)+l3*np.cos(q1+q2+q3)
         pitch = q1 + q2 + q3
 
-        return x, z+0.333, pitch
+        return x, z, pitch
     
     def set_initial_transform(self, pos = [400, 0, 0], rot = [0, 180, 0], gripper=0):
         x = pos[0]*0.001
@@ -150,7 +153,7 @@ class MujocoEnv:
         self.data.ctrl[7] = 255 + r4  # gripper
 
         x, z, pitch = self.foward_kinematics_3axis(q1 + r1, -q2 + r2, np.pi - q3 + r3)
-        print(x, z, pitch, 255 + r4)
+        # print(x, z, pitch, 255 + r4)
 
     # def set_joint_transform(self, r1, r2, r3, r4):
     #     q1, q2, q3 = self.inverse_kinematics_3axis(0.4, 0, np.pi)
