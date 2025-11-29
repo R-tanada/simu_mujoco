@@ -7,6 +7,7 @@ import threading
 
 class MujocoEnv:
     def __init__(self, model_path, visualize:bool = True):
+        self.visualize = visualize
 
         q1_range = [-1.7628, 1.7628]
         q2_range = [-3.0718, -0.0698]
@@ -19,15 +20,15 @@ class MujocoEnv:
 
         self.current_transform = [0.4, 0.1, np.pi]  # x, z, pitch
 
-        self.initialize(model_path, visualize)
+        self.initialize(model_path)
         print('initialized Mujoco Environment')
 
-    def initialize(self, model_path, visualize):
+    def initialize(self, model_path):
         self.model = mujoco.MjModel.from_xml_path(model_path)
         self.data = mujoco.MjData(self.model)
         self.renderer = mujoco.Renderer(self.model, 256, 256)
 
-        if visualize == True:
+        if self.visualize == True:
             self.cam = mujoco.MjvCamera()
             self.opt = mujoco.MjvOption()
             self.scene = mujoco.MjvScene(self.model, maxgeom=10000)
@@ -35,12 +36,14 @@ class MujocoEnv:
 
     def step(self):
         mujoco.mj_step(self.model, self.data)
-        self.v.sync()
+        if self.visualize == True:
+            self.v.sync()
 
     def step_custom_num(self, step_num):
         for i in range(step_num):
             mujoco.mj_step(self.model, self.data)
-        self.v.sync()
+        if self.visualize == True:
+            self.v.sync()
 
     def reset(self):
         mujoco.mj_resetData(self.model, self.data)

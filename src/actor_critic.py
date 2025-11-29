@@ -121,13 +121,14 @@ class Agent:
     def reward(self, current_pos, box_pos, t):
         r1 = 0
         done = False
+        # print(current_pos, box_pos)
         d  =  np.linalg.norm(current_pos-box_pos)
-        print(d)
         r0 = -d*10
-        if d < 0.15:
+        # print(r0)
+        if d < 0.2:
             done = True
             r1 = 300
-        elif t > 10:
+        elif t > 5:
             done = True
             r1 = -100
 

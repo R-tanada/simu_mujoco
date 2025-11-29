@@ -73,8 +73,6 @@ class Controller:
                 for key in self.button_num.keys():
                     self.pushed_button = self.joystick.get_button(self.button_num[key])
                     self.button_state[key] = self.pushed_button
-                    if self.pushed_button == 1:
-                        print(f"[ボタン{key}] 押下中")
 
                 r2_value = self.joystick.get_axis(5)
                 r2_normalized = (r2_value + 1) / 2 # 0.0〜1.0 に正規化

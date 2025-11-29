@@ -8,7 +8,7 @@ import mujoco
 
 
 model_path = "models/franka_emika_panda/scene.xml"
-mujo_env = MujocoEnv(model_path)
+mujo_env = MujocoEnv(model_path, visualize=False)
 robot_control = RoboControl(mujo_env)
 
 initial_time = time.perf_counter()
@@ -22,11 +22,12 @@ agent = Agent()
 
 loop_freq = 500  # Hz
 loop_time = 1.0 / loop_freq
-box_pos = [0.5, 0, 0.02]
+box_pos = [0.5, 0, 0.15]
+total_reward_list = []
 
 try:
     for episode in range(100):
-        robot_control.set_initial_transform_cartesian(x=400, z=300, pitch=180, gripper=255)
+        robot_control.initailize()
         state = img_process.preprocess_image(mujo_env.get_camera_rgb())
         done = False
         total_reward = 0
@@ -34,6 +35,7 @@ try:
 
         while not done:
             elapsed_time = time.perf_counter() - start_time
+            # print(f"elapsed_time: {elapsed_time:.3f} sec")
             # get current state
             action, mean = agent.get_action(state)
 
@@ -46,15 +48,17 @@ try:
 
             # get next state
             next_state = state = img_process.preprocess_image(mujo_env.get_camera_rgb())
-            current_pos = robot_control.get_transform_cartesian()
-            reward, done = agent.reward(np.array(current_pos), np.array(box_pos), elapsed_time)
+            x, z, pitch = robot_control.get_transform_cartesian()
+            reward, done = agent.reward(np.array([x, 0, z]), np.array(box_pos), elapsed_time)
 
             agent.update(state, action, mean, reward, next_state, done)
             state = next_state
             total_reward += reward
             # time.sleep(0.1)
 
-        print(total_reward)
+        total_reward_list.append(total_reward)
+        if episode % 10 == 0 and episode != 0:
+            print("episode:{}, ave_total_reward:{}".format(episode, sum(total_reward_list[-10:])/10))
 
 except KeyboardInterrupt:
     mujo_env.v.close()

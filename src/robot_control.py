@@ -26,15 +26,16 @@ class RoboControl:
         self.gamma2 = self.alpha2 - self.alpha1
         self.gamma3 = self.alpha3 - self.alpha2
 
-        self.current_x = 400*0.001
+        self.initailize()
+
+    def initailize(self):
+        self.current_x = 300*0.001
         self.current_z = 300*0.001
         self.current_pitch = 180*np.pi/180
-        self.current_q1, self.current_q2, self.current_q3 = self.inverse_kinematics_3dof(x=0.4, z=0.3, pitch=np.pi)
+        self.current_q1, self.current_q2, self.current_q3 = self.inverse_kinematics_3dof(x=0.3, z=0.3, pitch=np.pi)
         self.current_q4 = self.current_gripper = 255
-
-        self.set_initial_transform_cartesian(x=400, z=300, pitch=180, gripper=255)
-        time.sleep(1)
-        print('initialzed Robot')
+        self.set_initial_transform_cartesian(x=300, z=300, pitch=180, gripper=255)
+        # print('initialzed Robot')
 
     def set_initial_transform_joint_angle(self, q1, q2, q3, q4):
         # transform mj model
@@ -171,7 +172,6 @@ if __name__ == "__main__":
     buttom = Controller()
     buttom_thread = threading.Thread(target=buttom.get_joystick)
     buttom_thread.setDaemon(True)
-    print('check')
     buttom_thread.start()
     
 
@@ -179,11 +179,12 @@ if __name__ == "__main__":
         while True:
             buttom_state = buttom.get_button_state()
             robot.set_transform_with_controller(buttom_state)
+            print(robot.get_transform_cartesian())
+            body = model.data.body('hand')
+            body_pos = body.xpos
+            print(body_pos)
             model.step()
             model.v.sync()
 
-            time.sleep(1)
-            model.reset()
-        
     except KeyboardInterrupt:
         model.v.close()
