@@ -2,7 +2,7 @@ import mujoco
 import numpy as np
 from mujoco import viewer
 import time
-from actorcritic import ImagePreprocessor
+from actor_critic import ImagePreprocessor
 import threading
 
 class MujocoEnv:
@@ -35,10 +35,12 @@ class MujocoEnv:
 
     def step(self):
         mujoco.mj_step(self.model, self.data)
+        self.v.sync()
 
     def step_custom_num(self, step_num):
         for i in range(step_num):
             mujoco.mj_step(self.model, self.data)
+        self.v.sync()
 
     def reset(self):
         mujoco.mj_resetData(self.model, self.data)

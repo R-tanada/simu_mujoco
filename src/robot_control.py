@@ -2,7 +2,7 @@ from mujoco_env import MujocoEnv
 import numpy as np
 from mujoco import viewer
 import time
-from actorcritic import ImagePreprocessor
+# from actor_critic import ImagePreprocessor
 from controller import Controller
 import threading
 
@@ -29,8 +29,10 @@ class RoboControl:
         self.current_x = 400*0.001
         self.current_z = 300*0.001
         self.current_pitch = 180*np.pi/180
+        self.current_q1, self.current_q2, self.current_q3 = self.inverse_kinematics_3dof(x=0.4, z=0.3, pitch=np.pi)
+        self.current_q4 = self.current_gripper = 255
 
-        self.set_initial_transform_cartesian(400, 300, 180, 255)
+        self.set_initial_transform_cartesian(x=400, z=300, pitch=180, gripper=255)
         time.sleep(1)
         print('initialzed Robot')
 
@@ -86,6 +88,9 @@ class RoboControl:
 
         self.mujo.set_joint_transform(q1, q2, q3, q4)
         self.mujo.step()
+
+    def get_transform_cartesian(self):
+        return self.foward_kinematics_3dof(self.current_q1, self.current_q2, self.current_q3)
 
     def inverse_kinematics_3dof(self, x, z, pitch):
         pitch = pitch + self.alpha3
@@ -176,6 +181,9 @@ if __name__ == "__main__":
             robot.set_transform_with_controller(buttom_state)
             model.step()
             model.v.sync()
+
+            time.sleep(1)
+            model.reset()
         
     except KeyboardInterrupt:
         model.v.close()

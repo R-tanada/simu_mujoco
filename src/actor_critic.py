@@ -21,7 +21,6 @@ class ImagePreprocessor:
         img = self.normalize_image(img)
         img = self.transpose_image(img)
         return torch.from_numpy(img).unsqueeze(0)
-        # return torch.from_numpy(img)
 
 class PolicyNet(nn.Module):
     def __init__(self, action_size):
@@ -118,6 +117,22 @@ class Agent:
         self.optimizer_pi.zero_grad()
         loss_pi.backward()
         self.optimizer_pi.step()
+
+    def reward(self, current_pos, box_pos, t):
+        r1 = 0
+        done = False
+        d  =  np.linalg.norm(current_pos-box_pos)
+        print(d)
+        r0 = -d*10
+        if d < 0.15:
+            done = True
+            r1 = 300
+        elif t > 10:
+            done = True
+            r1 = -100
+
+        return r0+r1, done
+
 
 
 class ReplayBuffer:
