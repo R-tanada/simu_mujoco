@@ -26,18 +26,14 @@ class PolicyNet(nn.Module):
     def __init__(self, action_size):
         super().__init__()
 
-        self.l1 = nn.Conv2d(3, 16, 3)
-        self.l2 = nn.Conv2d(16, 1, 4)
-        self.l3 = nn.Linear(124*124, 124)
+        self.l1 = nn.Linear(action_size, 500)
+        self.l2 = nn.Linear(500, 124)
         self.mean_linear = nn.Linear(124, action_size)
         self.log_std_linear = nn.Linear(124, action_size)
 
     def forward(self, x):
         x = F.relu(self.l1(x))
-        x = F.max_pool2d(x, 2)
         x = F.relu(self.l2(x))
-        x = x.view(x.size()[0], -1)
-        x = F.relu(self.l3(x))
         mean = self.mean_linear(x)
         log_std = self.log_std_linear(x)
         return mean, log_std
@@ -45,15 +41,13 @@ class PolicyNet(nn.Module):
 class ValueNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.l1 = nn.Conv2d(3, 16, 3)
-        self.l2 = nn.Conv2d(16, 1, 4)
-        self.l3 = nn.Linear(124*124, 1)
+        self.l1 = nn.Linear(4, 500)
+        self.l2 = nn.Linear(500, 124)
+        self.l3 = nn.Linear(124, 1)
 
     def forward(self, x):
         x = F.relu(self.l1(x))
-        x = F.max_pool2d(x, 2)
         x = F.relu(self.l2(x))
-        x = x.view(x.size()[0], -1)
         x = F.relu(self.l3(x))
         return x
     
@@ -77,8 +71,8 @@ class Agent:
         normal = Normal(mean, std)
         x_t = normal.rsample()
         y_t = torch.tanh(x_t)
-        action = y_t*0.1
-        mean = torch.tanh(mean)*0.1
+        action = y_t*0.01
+        mean = torch.tanh(mean)*0.01
         # print(action)
         # mean = torch.tanh(mean)*2*np.pi*0.002
         # print(action)
@@ -124,8 +118,8 @@ class Agent:
         # print(current_pos, box_pos)
         d  =  np.linalg.norm(current_pos-box_pos)
         r0 = -d*10
-        # print(r0)
-        if d < 0.2:
+        print(r0)
+        if d < 0.1:
             done = True
             r1 = 300
         elif t > 5:

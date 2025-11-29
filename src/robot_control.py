@@ -92,6 +92,9 @@ class RoboControl:
 
     def get_transform_cartesian(self):
         return self.foward_kinematics_3dof(self.current_q1, self.current_q2, self.current_q3)
+    
+    def get_transform_joint_angle(self):
+        return self.current_q1, self.current_q2, self.current_q3, self.current_q4
 
     def inverse_kinematics_3dof(self, x, z, pitch):
         pitch = pitch + self.alpha3
