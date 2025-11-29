@@ -27,8 +27,8 @@ class PolicyNet(nn.Module):
     def __init__(self, action_size):
         super().__init__()
 
-        self.l1 = nn.Conv2d(3, 3, 3)
-        self.l2 = nn.Conv2d(3, 1, 4)
+        self.l1 = nn.Conv2d(3, 16, 3)
+        self.l2 = nn.Conv2d(16, 1, 4)
         self.l3 = nn.Linear(124*124, 124)
         self.mean_linear = nn.Linear(124, action_size)
         self.log_std_linear = nn.Linear(124, action_size)
@@ -46,8 +46,8 @@ class PolicyNet(nn.Module):
 class ValueNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.l1 = nn.Conv2d(3, 3, 3)
-        self.l2 = nn.Conv2d(3, 1, 4)
+        self.l1 = nn.Conv2d(3, 16, 3)
+        self.l2 = nn.Conv2d(16, 1, 4)
         self.l3 = nn.Linear(124*124, 1)
 
     def forward(self, x):
@@ -61,7 +61,7 @@ class ValueNet(nn.Module):
 class Agent:
     def __init__(self):
         self.gamma = 0.98
-        self.lr = 0.0001
+        self.lr = 0.002
         self.action_size = 4
 
         self.pi = PolicyNet(self.action_size)
@@ -73,16 +73,28 @@ class Agent:
     def get_action(self, state):
         mean, log_std = self.pi.forward(state)
         log_std = torch.clamp(log_std, -20, 2)
+<<<<<<< HEAD
         mean = torch.tanh(mean)*2*np.pi*0.002
         std = log_std.exp()*0.05
         print(std)
+=======
+        std = log_std.exp()
+        # print(std)
+>>>>>>> c0e16b10420b36aec4ff378c34cd141547357686
         normal = Normal(mean, std)
         x_t = normal.rsample()
         y_t = torch.tanh(x_t)
-        action = y_t
+        action = y_t*0.1
+        mean = torch.tanh(mean)*0.1
+        # print(action)
         # mean = torch.tanh(mean)*2*np.pi*0.002
         # print(action)
+<<<<<<< HEAD
         return action, mean, std
+=======
+        # print(action)
+        return action, mean
+>>>>>>> c0e16b10420b36aec4ff378c34cd141547357686
     
     # def update_batch(self):
     #     if len(self.reply.buffer) < 500:
@@ -97,33 +109,24 @@ class Agent:
     #     critic_loss.backward()
     #     self.optimizer_v.step()
 
-    def update(self, state, action, mean, std, reward, next_state, done):
+    def update(self, state, action, mean, reward, next_state, done):
         # ---- critic ----
         v_target = reward + self.gamma * self.v(next_state) * (1 - done)
-        v_target = v_target.detach()
 
         v_value = self.v(state)
         loss_v = F.mse_loss(v_value, v_target)
 
-        # ---- actor ----
-        delta = v_target - v_value
-        delta = delta.detach()
-
-        # 多次元ガウスの log pi（独立）
-        log_pi = -0.5*((action - mean)/std)**2 - torch.log(std) - 0.5*torch.log(torch.tensor(2*3.141592))
-
-        log_pi = log_pi.sum(dim=-1)  # 各dimensionを合計
-
-        loss_pi = -(log_pi * delta).mean()
-
         # ---- update ----
         self.optimizer_v.zero_grad()
-        self.optimizer_pi.zero_grad()
-
         loss_v.backward()
-        loss_pi.backward()
-
         self.optimizer_v.step()
+
+        # ---- actor ----
+        loss_pi = - self.v(state).mean()
+
+        # ---- update ----
+        self.optimizer_pi.zero_grad()
+        loss_pi.backward()
         self.optimizer_pi.step()
 
 

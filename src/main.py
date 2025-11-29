@@ -13,9 +13,7 @@ model_path = "models/franka_emika_panda/scene.xml"
 mujo_env = MujocoEnv(model_path)
 
 initial_time = time.perf_counter()
-policy = PolicyNet(3)
 process = ImagePreprocessor()
-value = ValueNet()
 agent = Agent()
 # buffer = ReplayBuffer(50, 20)
 
@@ -34,11 +32,11 @@ try:
         total_reward = 0
 
         while not done:
-            action, mean, std = agent.get_action(state)
+            action, mean = agent.get_action(state)
 
             next_state, reward, done = mujo_env.step(action)
 
-            agent.update(state, action, mean, std, reward, next_state, done)
+            agent.update(state, action, mean, reward, next_state, done)
             state = next_state
             total_reward += reward
             # time.sleep(0.1)
