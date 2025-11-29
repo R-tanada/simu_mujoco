@@ -73,6 +73,23 @@ class MujocoEnv:
     #     return next_state, reward+reward_2, done
     
 
+    # def step(self, action):
+
+    #     q1, q2, q3, q4 = action[0][0].item(), action[0][1].item(), action[0][2].item(), action[0][3].item()
+    #     self.set_joint_transform(q1, q2, q3, q4)
+
+    #     mujoco.mj_step(self.model, self.data)
+
+    #     next_state = self.process.preprocess_image(self.get_camera_rgb())
+    #     body = self.data.body('hand')
+    #     body_pos = body.xpos
+    #     body_quat = body.xquat
+    #     reward = 1.5 + self.reward(body_pos)*10
+    #     done, reward_2 = self.cheak_area(body_pos, body_quat)
+    #     print('reward:', reward)
+
+    #     return next_state, reward, done
+    
     def step(self, action):
 
         q1, q2, q3, q4 = action[0][0].item(), action[0][1].item(), action[0][2].item(), action[0][3].item()
@@ -89,10 +106,11 @@ class MujocoEnv:
         body = self.data.body('hand')
         body_pos = body.xpos
         body_quat = body.xquat
-        reward = self.reward(body_pos)
+        reward = 2.5 + self.reward(body_pos)*10
         done, reward_2 = self.cheak_area(body_pos, body_quat)
+        # print('reward:', reward)
 
-        return next_state, reward+reward_2, done
+        return next_state, reward, done
 
     def inverse_kinematics_3axis(self, x, z, pitch):
         l1 = 0.3264659247149693
@@ -196,7 +214,7 @@ class MujocoEnv:
     
     def reward(self, current_pos):
         box_pos = [0.5, 0, 0.02]
-        return -np.linalg.norm(current_pos-box_pos)*10
+        return -np.linalg.norm(current_pos-box_pos)
     
     def cheak_area(sefl, pos, quat):
         def quat_to_euler_wxyz(quat):
@@ -226,13 +244,7 @@ class MujocoEnv:
         euler = quat_to_euler_wxyz(quat)
         box_pos = [0.5, 0, 0.02]
 
-        if pos[0] < 0.35 or pos[0] > 0.6:
-            return True, -100
-        elif pos[2] < 0.12 or pos[2] > 0.5:
-            return True, -100
-        elif euler[1] < -0.45 or euler[1] > 0.45:
-            return True, -100
-        elif np.linalg.norm(pos - box_pos)<0.13:
+        if np.linalg.norm(pos - box_pos)<0.13:
             return True, 100
         
         return False, 0
