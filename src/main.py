@@ -1,9 +1,6 @@
-from mujocoenv import MujocoEnv
-from actorcritic import PolicyNet, ImagePreprocessor, ValueNet, Agent, ReplayBuffer
-# from controller import Controller
-import threading
+from mujoco_env import MujocoEnv
+from actor_critic import ImagePreprocessor, Agent
 import time
-import math
 import numpy as np  
 import cv2
 import mujoco
